@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "953069537065",
+    "project_id": "kost-app-8fb66",
+    "storage_bucket": "kost-app-8fb66.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:953069537065:android:c7a0bafc82b3504710d938",
+        "android_client_info": {
+          "package_name": "com.example.kostku"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB0ZDHIrFPssbl9PY8R_k6K519Zq1VURM0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
