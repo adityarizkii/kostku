@@ -2,22 +2,17 @@ package com.example.kostku
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
+import com.example.kostku.adapter.AdminPagerAdapter
 import com.example.kostku.databinding.ActivityAdminBinding
-import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import com.google.android.material.tabs.TabLayoutMediator
 
 class AdminActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAdminBinding
-    private val db = FirebaseFirestore.getInstance()
-    private val TAG = "AdminActivity"
+    private lateinit var pagerAdapter: AdminPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,40 +20,24 @@ class AdminActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
-        setupClickListeners()
+        setupViewPager()
+        setupTabLayout()
     }
 
-    private fun setupClickListeners() {
-        binding.btnPost.setOnClickListener {
-            val message = binding.etMessage.text.toString()
-            if (message.isNotEmpty()) {
-                postAnnouncement(message)
-            } else {
-                binding.tilMessage.error = "Message is required"
-            }
-        }
+    private fun setupViewPager() {
+        pagerAdapter = AdminPagerAdapter(this)
+        binding.viewPager.adapter = pagerAdapter
     }
 
-    private fun postAnnouncement(message: String) {
-        lifecycleScope.launch {
-            try {
-                val announcement = hashMapOf(
-                    "message" to message,
-                    "timestamp" to Timestamp.now()
-                )
-
-                db.collection("announcement")
-                    .add(announcement)
-                    .await()
-
-                Toast.makeText(this@AdminActivity, "Announcement posted successfully", Toast.LENGTH_SHORT).show()
-                binding.etMessage.text?.clear()
-                binding.tilMessage.error = null
-            } catch (e: Exception) {
-                Log.e(TAG, "Error posting announcement", e)
-                Toast.makeText(this@AdminActivity, "Error posting announcement: ${e.message}", Toast.LENGTH_SHORT).show()
+    private fun setupTabLayout() {
+        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+            tab.text = when (position) {
+                0 -> "Announcement"
+                1 -> "Payment"
+                2 -> "User"
+                else -> ""
             }
-        }
+        }.attach()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

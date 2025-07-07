@@ -46,6 +46,7 @@ class AnnouncementFragment : Fragment() {
                 Log.d("AnnouncementFragment", "Starting to load announcements...")
                 
                 val querySnapshot = db.collection("announcement")
+                    .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
                     .get()
                     .await()
 
@@ -65,6 +66,7 @@ class AnnouncementFragment : Fragment() {
                 val announcements = querySnapshot.documents.mapNotNull { doc ->
                     try {
                         val message = doc.getString("message")
+                        val timestamp = doc.getTimestamp("timestamp")
                         Log.d("AnnouncementFragment", "Processing document ${doc.id}: message=$message")
                         
                         if (message == null) {
@@ -72,7 +74,7 @@ class AnnouncementFragment : Fragment() {
                             return@mapNotNull null
                         }
                         
-                        Announcement(message = message)
+                        Announcement(message = message, timestamp = timestamp, id = doc.id)
                     } catch (e: Exception) {
                         Log.e("AnnouncementFragment", "Error parsing announcement ${doc.id}: ${e.message}")
                         null
@@ -80,7 +82,9 @@ class AnnouncementFragment : Fragment() {
                 }
                 
                 Log.d("AnnouncementFragment", "Successfully parsed ${announcements.size} announcements")
-                binding.rvAnnouncements.adapter = AnnouncementAdapter(announcements)
+                binding.rvAnnouncements.adapter = AnnouncementAdapter(announcements) { announcement ->
+                    // Do nothing for regular users - delete only available for admin
+                }
             } catch (e: Exception) {
                 Log.e("AnnouncementFragment", "Error loading announcements", e)
                 Toast.makeText(context, "Error loading announcements: ${e.message}", Toast.LENGTH_SHORT).show()
